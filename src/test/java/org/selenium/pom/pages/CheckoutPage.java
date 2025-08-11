@@ -1,6 +1,7 @@
 package org.selenium.pom.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -14,7 +15,7 @@ public class CheckoutPage extends BasePage {
 
     private final By firstNameField = By.id("billing_first_name");
     private final By lastNameField = By.id("billing_last_name");
-    private final By addressField = By.id("billing_address_1");
+    private final By addressLineOneField = By.id("billing_address_1");
     private final By cityField = By.id("billing_city");
     private final By postalCodeField = By.id("billing_postcode");
     private final By emailField = By.id("billing_email");
@@ -30,15 +31,20 @@ public class CheckoutPage extends BasePage {
     private final By countryDropdown = By.id("billing_country");
     private final By stateDropdown = By.id("billing_state");
 
-    private final By directBankTransferButton = By.id("payment_method_bacs");
+    private final By alternateCountryDropDown = By.id("select2-billing_country-container");
+    private final By alternateStateDropDown = By.id("select2-billing_state-container");
 
     private final By productName = By.cssSelector("td[class='product-name']");
+
+    private final By directBankTransferRadioBtn = By.id("payment_method_bacs");
+    private final By cashOnDeliveryTransferRadioBtn = By.id("payment_method_cod");
 
 
     public CheckoutPage(WebDriver driver) {
         super(driver);
     }
-    public CheckoutPage load(){
+
+    public CheckoutPage load() {
         load("/checkout/");
         return this;
     }
@@ -58,21 +64,25 @@ public class CheckoutPage extends BasePage {
     }
 
     public CheckoutPage selectCountry(String countryName) {
-        Select select = new Select(wait.until(ExpectedConditions.elementToBeClickable(countryDropdown)));
+        Select select = new Select(waitForElementToBeClickable(countryDropdown));
         select.selectByVisibleText(countryName);
 
         return this;
     }
 
     public CheckoutPage selectState(String stateName) {
-        Select select = new Select(wait.until(ExpectedConditions.elementToBeClickable(stateDropdown)));
-        select.selectByVisibleText(stateName);
-
+//        Select select = new Select(wait.until(ExpectedConditions.elementToBeClickable(stateDropdown)));
+//        select.selectByVisibleText(stateName);
+        waitForElementToBeClickable(alternateStateDropDown).click();
+        WebElement e = waitForElementToBeClickable(
+                By.xpath("//li[text()='" + stateName + "']"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", e);
+        e.click();
         return this;
     }
 
-    public CheckoutPage enterAddress(String addressName) {
-        WebElement element = waitForElementToBeVisible(addressField);
+    public CheckoutPage enterAddressLineOne(String addressName) {
+        WebElement element = waitForElementToBeVisible(addressLineOneField);
         element.clear();
         element.sendKeys(addressName);
         return this;
@@ -103,7 +113,7 @@ public class CheckoutPage extends BasePage {
         return enterFirstName(billingAddress.getFirstName()).
                 enterLastName(billingAddress.getLastName()).
                 selectCountry(billingAddress.getCountry()).
-                enterAddress(billingAddress.getAddress()).
+                enterAddressLineOne(billingAddress.getAddress()).
                 enterCity(billingAddress.getCity()).
                 selectState(billingAddress.getState()).
                 enterPostalCode(billingAddress.getPostalCode()).
@@ -113,12 +123,12 @@ public class CheckoutPage extends BasePage {
 
     public CheckoutPage placeOrder() {
         waitForOverlaysToDisappear(overlay);
-        wait.until(ExpectedConditions.elementToBeClickable((placeOrderButton))).click();
+        waitForElementToBeClickable(placeOrderButton).click();
         return this;
     }
 
     public String getNotice() {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(successNotice)).getText();
+        return waitForElementToBeLocated(successNotice).getText();
     }
 
     public CheckoutPage clickHereToLoginLink() {
@@ -126,17 +136,15 @@ public class CheckoutPage extends BasePage {
         return this;
     }
 
-    public CheckoutPage enterUserName(User user) {
+    public CheckoutPage enterUserName(String user) {
         WebElement element = waitForElementToBeLocated(userNameField);
         element.clear();
-        element.sendKeys(user.getUserName());
         return this;
     }
 
-    public CheckoutPage enterPassword(User user) {
+    public CheckoutPage enterPassword(String user) {
         WebElement element = waitForElementToBeLocated(passwordField);
         element.clear();
-        element.sendKeys(user.getPassword());
         return this;
     }
 
@@ -146,19 +154,40 @@ public class CheckoutPage extends BasePage {
     }
 
     public CheckoutPage login(User user) {
-        return enterUserName(user).
-                enterPassword(user).
-                clickLoginButton();
+        return enterUserName(user.getUserName()).
+                enterPassword(user.getPassword()).
+                clickLoginButton().
+                waitForLoginBtnToDisappear();
+    }
+
+    public CheckoutPage selectDirectBankTransfer() {
+        WebElement e = waitForElementToBeClickable(directBankTransferRadioBtn);
+        if (!e.isSelected()) {
+            e.click();
+        }
+        return this;
+    }
+
+    private CheckoutPage waitForLoginBtnToDisappear() {
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(loginButton));
+        return this;
     }
 
     public CheckoutPage selectBankTransfer() {
-        WebElement element = wait.until(ExpectedConditions.elementToBeClickable(directBankTransferButton));
+        WebElement element = waitForElementToBeClickable(directBankTransferRadioBtn);
         if (!element.isSelected()) {
             element.click();
         }
         return this;
     }
-    public String getProductName(){
-       return waitForElementToBeVisible(productName).getText();
+
+    public CheckoutPage selectCashOnDeliveryTransfer() {
+        waitForElementToBeClickable(cashOnDeliveryTransferRadioBtn).click();
+        return this;
     }
+
+    public String getProductName() {
+        return waitForElementToBeVisible(productName).getText();
+    }
+
 }

@@ -6,5 +6,7 @@
   "city": "Pune",
   "state": "Maharashtra",
   "postalCode": "411001",
-  "email": "blabla@gmail.com"
+  "email": "blabla@gmail.com",
+  "company": "TDC",
+  "phone": "1234567890"
   }

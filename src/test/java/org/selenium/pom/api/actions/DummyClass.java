@@ -1,7 +1,6 @@
 package org.selenium.pom.api.actions;
 
 import org.selenium.pom.objects.User;
-import org.selenium.pom.utils.ConfigLoader;
 import org.selenium.pom.utils.FakerUtils;
 
 public class DummyClass {

@@ -1,6 +1,6 @@
 package org.selenium.pom.utils;
 
-import org.selenium.pom.constans.EnvType;
+import org.selenium.pom.constants.EnvType;
 
 import java.util.Properties;
 

@@ -7,8 +7,9 @@ import io.restassured.response.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.selenium.pom.api.ApiRequest;
+import org.selenium.pom.constants.EndPoint;
 import org.selenium.pom.objects.User;
-import org.selenium.pom.utils.ConfigLoader;
 
 import java.util.HashMap;
 
@@ -22,59 +23,41 @@ public class SignUpApi {
         return cookies;
     }
 
-    public String fetchRegisterNonceValueUsingGroovy() {
+    private String fetchRegisterNonceValueUsingGroovy() {
         Response response = getAccount();
-        return response.htmlPath().getString("**.findAll { it.@name == 'woocommerce-register-nonce'}.@value");
+        return response.htmlPath().getString("**.findAll { it.@name == 'woocommerce-register-nonce' }.@value");
     }
 
-    public String fetchRegisterNonceValueUsingJSoup() {
+    private String fetchRegisterNonceValueUsingJsoup() {
         Response response = getAccount();
-        Document doc = Jsoup.parse(response.body().asString());
-        Element element = doc.select(".woocommerce-form-row.form-row input[id='woocommerce-register-nonce']").first();
+        Document doc = Jsoup.parse(response.body().prettyPrint());
+        Element element = doc.selectFirst("#woocommerce-register-nonce");
         return element.attr("value");
     }
 
     private Response getAccount() {
         Cookies cookies = new Cookies();
-        Response response = given().
-                baseUri(ConfigLoader.getInstance().getBaseUrl()).
-                cookies(cookies).
-                log().all().
-                when().
-                get("/account").
-                then().
-                log().all().
-                extract().
-                response();
+        Response response = ApiRequest.get(EndPoint.ACCOUNT.url, cookies);
         if (response.getStatusCode() != 200) {
-            throw new RuntimeException("Failed to fetch the account, HTTP Status Code: " + response);
+            throw new RuntimeException("Failed to fetch the account, HTTP Status Code: " + response.getStatusCode());
         }
         return response;
     }
+
     public Response register(User user) {
         Cookies cookies = new Cookies();
-        Header header = new Header("content-type","application/x-www-form-urlencoded");
+        Header header = new Header("content-type", "application/x-www-form-urlencoded");
         Headers headers = new Headers(header);
-        HashMap<String, String> formParams = new HashMap<>();
+        HashMap<String, Object> formParams = new HashMap<>();
         formParams.put("username", user.getUserName());
-        formParams.put("password", user.getPassword());
         formParams.put("email", user.getEmail());
-        formParams.put("woocommerce-register-nonce", fetchRegisterNonceValueUsingJSoup());
+        formParams.put("password", user.getPassword());
+        formParams.put("woocommerce-register-nonce", fetchRegisterNonceValueUsingJsoup());
         formParams.put("register", "Register");
-        Response response = given().
-                baseUri(ConfigLoader.getInstance().getBaseUrl()).
-                headers(headers).
-                formParams(formParams).
-                cookies(cookies).
-                log().all().
-                when().
-        post("/account").
-                then().
-                log().all().
-                extract().
-                response();
+        Response response = ApiRequest.post(EndPoint.ACCOUNT.url, headers, formParams, cookies);
+
         if (response.getStatusCode() != 302) {
-            throw new RuntimeException("Failed to register the account, HTTP Status Code: " + response);
+            throw new RuntimeException("Failed to register the account, HTTP Status Code: " + response.getStatusCode());
         }
         this.cookies = response.getDetailedCookies();
         return response;

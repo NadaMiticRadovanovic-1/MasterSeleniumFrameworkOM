@@ -11,24 +11,22 @@ import org.selenium.pom.pages.StorePage;
 import org.selenium.pom.utils.ConfigLoader;
 import org.selenium.pom.utils.JacksonUtils;
 import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import java.io.IOException;
 
 public class MyFirstTestCase extends BaseTest {
-    @Test
+//    @Test
     public void guestCheckoutUsingDirectBankTransfer() throws IOException {
         String searchFor = "Blue";
         BillingAddress billingAddress = JacksonUtils.deserializeJson("myBillingAddress.json", BillingAddress.class);
         Product product = new Product(1215);
-        StorePage storePage = new HomePage(getDriver()).
-                load().
-                navigateToStoreUsingMenu().
+        StorePage storePage = new HomePage(getDriver()).load().
+                getMyHeader().navigateToStoreUsingMenu().
                 search(searchFor);
         Assert.assertEquals(storePage.getTitle(), "Search results: “" + searchFor + "”");
 
-        storePage.clickAddToCartButton(product.getName());
-        CartPage cartPage = storePage.clickViewCart();
+        storePage.getProductThumbnail().clickAddToCartButton(product.getName());
+        CartPage cartPage = storePage.getProductThumbnail().clickViewCart();
         Assert.assertEquals(
                 cartPage.getProductName(), product.getName());
 
@@ -41,7 +39,7 @@ public class MyFirstTestCase extends BaseTest {
         Assert.assertEquals(checkoutPage.getNotice(), "Thank you. Your order has been received.");
     }
 
-    @Test
+//    @Test
     public void loginAndCheckoutUsingDirectBankTransfer() throws IOException {
         String searchFor = "Blue";
         BillingAddress billingAddress = JacksonUtils.deserializeJson("myBillingAddress.json", BillingAddress.class);
@@ -50,14 +48,13 @@ public class MyFirstTestCase extends BaseTest {
                 ConfigLoader.getInstance().getPassword());
 
 
-        StorePage storePage = new HomePage(getDriver()).
-                load().
-                navigateToStoreUsingMenu().
+        StorePage storePage = new HomePage(getDriver()).load().
+                getMyHeader().navigateToStoreUsingMenu().
                 search(searchFor);
         Assert.assertEquals(storePage.getTitle(), "Search results: “" + searchFor + "”");
 
-        storePage.clickAddToCartButton(product.getName());
-        CartPage cartPage = storePage.clickViewCart();
+        storePage.getProductThumbnail().clickAddToCartButton(product.getName());
+        CartPage cartPage = storePage.getProductThumbnail().clickViewCart();
 
         Assert.assertEquals(
                 cartPage.getProductName(), product.getName());

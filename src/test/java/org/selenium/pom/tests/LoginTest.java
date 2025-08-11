@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public class LoginTest extends BaseTest {
     @Test
-    public void loginDuringCheckOut() throws IOException, InterruptedException {
+    public void loginDuringCheckOut() throws Exception {
 
         String userName = "demoUserNada" + new FakerUtils().generateRandomNumber();
         String password = "demoPSW";

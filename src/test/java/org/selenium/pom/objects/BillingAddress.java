@@ -6,10 +6,40 @@ import org.selenium.pom.base.BasePage;
 public class BillingAddress {
     private String firstName;
     private String lastName;
-    private String address;
+    private String addressLineOne;
     private String city;
     private String postalCode;
     private String email;
+    private String country;
+    private String state;
+    private String company;
+    private String phone;
+
+    public String getAddressLineOne() {
+        return addressLineOne;
+    }
+
+    public void setAddressLineOne(String addressLineOne) {
+        this.addressLineOne = addressLineOne;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+
 
     public String getCountry() {
         return country;
@@ -27,22 +57,24 @@ public class BillingAddress {
         this.state = state;
     }
 
-    private String country;
-    private String state;
-
 
     public BillingAddress(){
 
     }
 
-    public BillingAddress(String firstName, String lastName, String address, String city,
-                          String postalCode, String email){
+    public BillingAddress(String firstName, String lastName, String addressLineOne, String city,
+                          String postalCode, String email, String country,String state, String company,
+                          String phone ){
         this.firstName = firstName;
         this.lastName = lastName;
-        this. address  =address;
+        this.addressLineOne  =addressLineOne;
         this.city = city;
         this.postalCode = postalCode;
         this.email = email;
+        this.country = country;
+        this.state = state;
+        this.company = company;
+        this.phone = phone;
     }
     public String getFirstName() {
         return firstName;
@@ -63,11 +95,11 @@ public class BillingAddress {
     }
 
     public String getAddress() {
-        return address;
+        return addressLineOne;
     }
 
-    public BillingAddress setAddress(String address) {
-        this.address = address;
+    public BillingAddress setAddress(String addressLineOne) {
+        this.addressLineOne = addressLineOne;
         return this;
     }
 
